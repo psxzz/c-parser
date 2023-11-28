@@ -4,58 +4,63 @@ class CProgramParser extends RegexParsers {
     // Tokens
     def identifier: Parser[Identifier] = """[a-zA-Z_][0-9a-zA-Z_]*""".r ^^ { id => Identifier(id.toString) }
 
-    def number: Parser[IntTk] = """(0|[1-9]\d*)""".r ^^ { v => IntTk(v.toInt) }
+    def number: Parser[IntValue] = """(0|[1-9]\d*)""".r ^^ { v => IntValue(v.toInt) }
 
-    def bool: Parser[BoolTk] = """(true|false)""".r ^^ { v => BoolTk(v.toBoolean) }
+    def bool: Parser[BoolValue] = """(true|false)""".r ^^ { v => BoolValue(v.toBoolean) }
 
     def typedef: Parser[Type] = """(int|bool)""".r ^^ { t => Type(t) }
 
     // Declarations
-    def varDecl: Parser[VariableDeclTk] = typedef ~ identifier ~ opt("=" ~> (arithExp | boolExp)) <~ ";" ^^ {
-        case t ~ id ~ exp => VariableDeclTk(t, id, exp)
+    def varDecl: Parser[Variable] = typedef ~ identifier ~ opt("=" ~> (bool | number)) <~ ";" ^^ { // TODO: replace (bool|number) with expression
+        case t ~ id ~ Some(v) => v match {
+            case IntValue(iv) => IntVariable(t.t, id.id, iv)    // TODO: handle wrong type error
+            case BoolValue(bv) => BoolVariable(t.t, id.id, bv)  // TODO: handle wrong type error
+        }
+        case t ~ id ~ None => t.t match {
+            case "int" => IntVariable(t.t, id.id, 0)
+            case "bool" => BoolVariable(t.t, id.id, false)
+        }
     }
 
-    def funcDecl: Parser[FunctionDeclTk] = typedef ~ identifier ~ "()" ~ compound ^^ {
-        case t ~ id ~ _ ~ body => FunctionDeclTk(t, id, body)
+    def funcDecl: Parser[Function] = typedef ~ identifier ~ "()" ~ (compound | ";") ^^ {
+        case t ~ id ~ _ ~ ";" => t.t match {
+            case "int" => IntFunction(id.id, None)
+            case "bool" => BoolFunction(id.id, None)
+        }
+        case t ~ id ~ _ ~ CompoundStmt(body)=> t.t match {
+            case "int" => IntFunction(id.id, Some(CompoundStmt(body)))
+            case "bool" => BoolFunction(id.id, Some(CompoundStmt(body)))
+        }
     }
 
     // Statements
-    def statement: Parser[Stmt] = compound | assign ^^ { _ => CompoundStmt() }
-
-    def compound: Parser[CompoundStmt] = "{" ~ rep(statement) ~ "}" ^^ { _ => CompoundStmt() }
-
-    def assign: Parser[AssignStmt] = identifier ~ "=" ~ expression ^^ {
-        case id ~ _ ~ exp => AssignStmt(id, exp)
+    def statement : Parser[Statement] = (compound | assign) ^^ {
+        case AssignStmt(id, v) => AssignStmt(id, v)
     }
 
-    // Expressions
-    def expression: Parser[Exp] = identifierExp | constantExp | arithExp | boolExp ^^ {}
+    def compound : Parser[CompoundStmt] = "{" ~> rep(statement) <~ "}" ^^ {
+        stmts => {
+            val res = CompoundStmt(Nil)
+            for (stmt <- stmts) {
+                res.stmts = stmt :: res.stmts
+            }
+            res
+        }
+    }
 
-    def identifierExp: Parser[IdentifierExp] = identifier ^^ {}
-
-    def constantExp: Parser[ConstantExp] = number | bool ^^ {}
-
-    def arithExp: Parser[ArithExp] = add | sub ^^ {}
-
-    def boolExp: Parser[BoolExp] = bool ^^ {}
-
-    // Arithmetical operations
-    def add: Parser[AddOp] = expression ~ "+" ~ expression ^^ {}
-
-    def sub: Parser[SubOp] = expression ~ "-" ~ expression ^^ {}
-    // Boolean operations
+    def assign : Parser[AssignStmt] = identifier ~ "=" ~ (bool | number | identifier) <~ ";"^^ {
+        case id ~ _ ~ v  => AssignStmt(id.id, v)
+    }
 
     // Entry point
-    def program: Parser[ProgramTk] = rep(varDecl | funcDecl) ^^ {
+    def program: Parser[Program] = rep(varDecl | funcDecl) ^^ {
         case vs =>
-            val prog = ProgramTk()
+            val prog = Program()
             for (v <- vs) v match {
-                case VariableDeclTk(t, id, value) => {
-                    prog.globalVarDecls = VariableDeclTk(t, id, value) :: prog.globalVarDecls
-                }
-                case FunctionDeclTk(t, id, body) => {
-                    prog.globalFuncDecls = FunctionDeclTk(t, id, body) :: prog.globalFuncDecls
-                }
+                case IntVariable(_, id, value) =>  prog.globalEnv += (id -> value)
+                case BoolVariable(_, id, value) => prog.globalEnv += (id -> value)
+                case IntFunction(id, body) => prog.globalEnv += (id -> body)
+                case BoolFunction(id, body) => prog.globalEnv += (id -> body)
             }
             prog
     }

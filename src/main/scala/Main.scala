@@ -1,5 +1,5 @@
 object Main {
-    def main(args: Array[String]) = {
+    def main(args: Array[String]): Unit = {
         val reader : InputReader = FileInputReader("./input/main.c")
 //        val reader : InputReader = ConsoleInputReader()
         val lines = reader.read()

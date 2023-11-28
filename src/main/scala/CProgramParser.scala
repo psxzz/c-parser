@@ -20,6 +20,7 @@ class CProgramParser extends RegexParsers {
             case "int" => IntVariable(t.t, id.id, 0)
             case "bool" => BoolVariable(t.t, id.id, false)
         }
+        // TODO: add default case?
     }
 
     def funcDecl: Parser[Function] = typedef ~ identifier ~ "()" ~ (compound | ";") ^^ {

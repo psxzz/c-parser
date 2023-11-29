@@ -1,7 +1,7 @@
 object Main {
     def main(args: Array[String]): Unit = {
-        val reader : InputReader = FileInputReader("./input/main.c")
-//        val reader : InputReader = ConsoleInputReader()
+        val reader = InputReader(new FileInputSource("./input/main.c"))
+//        val reader = InputReader(new ConsoleInputSource)
         val lines = reader.read()
 
         val parser : CProgramParser = new CProgramParser

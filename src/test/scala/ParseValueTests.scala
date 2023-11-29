@@ -14,7 +14,10 @@ class ParseValueTests extends AnyFunSuite{
     }
 
     test("Incorrect values") {
-        val intResult = p.parse(p.number, "12d3")
+        var intResult = p.parse(p.number, "12d3")
+        assert(!intResult.successful)
+
+        intResult = p.parse(p.number, "043")
         assert(!intResult.successful)
 
         val boolResult = p.parse(p.bool, "falce")

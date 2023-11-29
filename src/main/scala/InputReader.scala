@@ -1,30 +1,23 @@
-abstract class InputReader {
-    def read(): String
+abstract class InputSource {
+    def getLines: String
 }
 
-class FileInputReader(filename: String) extends InputReader {
-    override def read(): String = {
-        val source = scala.io.Source.fromFile(filename)
-        val lines = try source.mkString finally source.close()
+class ConsoleInputSource extends InputSource {
+    override def getLines: String = scala.io.Source.stdin.mkString
+}
 
-        lines
+class FileInputSource(name : String) extends InputSource {
+    override def getLines: String = {
+        val f = scala.io.Source.fromFile(name)
+        try f.mkString finally f.close()
     }
 }
 
-object FileInputReader {
-    def apply(filename: String) = new FileInputReader(filename)
+
+class InputReader(source: InputSource) {
+    def read() : String = source.getLines
 }
 
-
-class ConsoleInputReader extends InputReader {
-    override def read(): String = {
-        val source = scala.io.Source.stdin
-        val lines = try source.mkString finally source.close()
-
-        lines
-    }
-}
-
-object ConsoleInputReader {
-    def apply() = new ConsoleInputReader
+object InputReader {
+    def apply(source: InputSource) = new InputReader(source)
 }

@@ -1,11 +1,11 @@
-import scala.collection.mutable.Map
+import scala.collection.mutable
 
 sealed trait Token
 
 // Program is a entry point for parser
 case class Program() extends Token {
     // globalEnv is a global-scope environment that holds data about variables and functions
-    val globalEnv : Map[String, Any] = Map[String, Any]()
+    val globalEnv = mutable.Map[String, Any]()
 
 
     override def toString: String = globalEnv.toString()

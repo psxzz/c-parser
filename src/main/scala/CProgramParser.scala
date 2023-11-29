@@ -4,7 +4,7 @@ class CProgramParser extends RegexParsers {
     // Tokens
     def identifier: Parser[Identifier] = """[a-zA-Z_][0-9a-zA-Z_]*""".r ^^ { id => Identifier(id.toString) }
 
-    def number: Parser[IntValue] = """(0|[1-9]\d*)""".r ^^ { v => IntValue(v.toInt) }
+    def number: Parser[IntValue] = """\b(0|[1-9]\d*)\b""".r ^^ { v => IntValue(v.toInt) }
 
     def bool: Parser[BoolValue] = """(true|false)""".r ^^ { v => BoolValue(v.toBoolean) }
 

@@ -18,8 +18,8 @@ case class IntValue(value : Int) extends Token
 case class BoolValue(value : Boolean) extends Token
 
 abstract class Variable extends Token
-case class IntVariable(t : String, id : String, value : Int) extends Variable
-case class BoolVariable(t : String, id : String, value : Boolean) extends Variable
+case class IntVariable(id : String, value : Int) extends Variable
+case class BoolVariable(id : String, value : Boolean) extends Variable
 
 abstract class Function(body : Option[CompoundStmt]) extends Token
 case class IntFunction(id : String, body : Option[CompoundStmt]) extends Function(body)

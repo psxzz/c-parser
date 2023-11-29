@@ -13,12 +13,12 @@ class CProgramParser extends RegexParsers {
     // Declarations
     def varDecl: Parser[Variable] = typedef ~ identifier ~ opt("=" ~> (bool | number)) <~ ";" ^^ { // TODO: replace (bool|number) with expression
         case t ~ id ~ Some(v) => v match {
-            case IntValue(iv) => IntVariable(t.t, id.id, iv)    // TODO: handle wrong type error
-            case BoolValue(bv) => BoolVariable(t.t, id.id, bv)  // TODO: handle wrong type error
+            case IntValue(iv) => IntVariable(id.id, iv)    // TODO: handle wrong type error
+            case BoolValue(bv) => BoolVariable(id.id, bv)  // TODO: handle wrong type error
         }
         case t ~ id ~ None => t.t match {
-            case "int" => IntVariable(t.t, id.id, 0)
-            case "bool" => BoolVariable(t.t, id.id, false)
+            case "int" => IntVariable(id.id, 0)
+            case "bool" => BoolVariable(id.id, false)
         }
         // TODO: add default case?
     }
@@ -50,6 +50,8 @@ class CProgramParser extends RegexParsers {
     }
 
     def assign : Parser[AssignStmt] = identifier ~ "=" ~ (bool | number | identifier) <~ ";"^^ {
+        case id  ~ _ ~ IntValue(v) => AssignStmt(id.id, v)
+        case id  ~ _ ~ BoolValue(v) => AssignStmt(id.id, v)
         case id ~ _ ~ v  => AssignStmt(id.id, v)
     }
 
@@ -58,8 +60,8 @@ class CProgramParser extends RegexParsers {
         case vs =>
             val prog = Program()
             for (v <- vs) v match {
-                case IntVariable(_, id, value) =>  prog.globalEnv += (id -> value)
-                case BoolVariable(_, id, value) => prog.globalEnv += (id -> value)
+                case IntVariable(id, value) =>  prog.globalEnv += (id -> value)
+                case BoolVariable(id, value) => prog.globalEnv += (id -> value)
                 case IntFunction(id, body) => prog.globalEnv += (id -> body)
                 case BoolFunction(id, body) => prog.globalEnv += (id -> body)
             }

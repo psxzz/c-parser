@@ -14,8 +14,9 @@ case class Program() extends Token {
 case class Type(t : String) extends Token
 case class Identifier(id : String) extends Token
 
-case class IntValue(value : Int) extends Token
-case class BoolValue(value : Boolean) extends Token
+abstract class Value extends Token
+case class IntValue(value : Int) extends Value
+case class BoolValue(value : Boolean) extends Value
 
 abstract class Variable extends Token
 case class IntVariable(id : String, value : Int) extends Variable

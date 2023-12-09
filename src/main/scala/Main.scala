@@ -12,5 +12,7 @@ object Main {
             case parser.Failure(msg, _) => println("FAILURE: " + msg)
             case parser.Error(msg, _) => println("ERROR: " + msg)
         }
+
+        result.get.Execute
     }
 }

@@ -4,7 +4,7 @@ object Main {
 //        val reader = InputReader(new ConsoleInputSource)
         val lines = reader.read()
 
-        val parser : CProgramParser = new CProgramParser
+        val parser = CProgramParser()
         val result = parser.parse(parser.program, lines)
 
         result match {

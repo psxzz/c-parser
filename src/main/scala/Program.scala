@@ -1,40 +1,24 @@
 import scala.collection.mutable
 
-class Environment extends mutable.HashMap[String, Int];
+class Environment {
+    var variables = new mutable.HashMap[String, Int]
+    var functions = new mutable.HashMap[String, Option[CompoundStmt]]
+
+    override def toString: String = "Variables: " + variables.toString +
+      "\n" + "Functions: " + functions.toString
+};
 
 case class Program() {
-    var declarations = List[Declaration]()
+    var declarations = new mutable.Queue[Declaration]()
 
 
     def Execute = {
-        var globalVarEnv : Environment = new Environment
-        var globalFuncEnv : Environment = new Environment
+        val globalEnv : Environment = new Environment
 
-        declarations.foreach {
-            case v: VarDecl => v.Execute(globalVarEnv)
-            case f: FuncDecl => f.Execute(globalFuncEnv)
-        }
+        declarations.foreach(_.Execute(globalEnv))
 
-        println("Variables: " + globalVarEnv.toString)
-        println("Functions: " + globalFuncEnv.toString)
+        globalEnv.functions("main").get.Execute(globalEnv)
+
+        println(globalEnv)
     }
 }
-
-abstract class Declaration {
-    def Execute(env : Environment): Unit
-}
-
-case class VarDecl(id: String, exp: Expression) extends Declaration {
-    override def Execute(env : Environment): Unit = {
-        env += (id -> exp.calc(env))
-    }
-}
-
-case class FuncDecl(id: String) extends Declaration {
-    override def Execute(env: Environment): Unit = {
-        env += (id -> -1)
-    }
-}
-
-
-//case class Func(identifier: String, value: Int) extends Declaration;

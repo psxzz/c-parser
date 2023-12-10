@@ -5,9 +5,12 @@ abstract class Statement {
 }
 
 case class CompoundStmt() extends Statement {
+    var declarations = mutable.Queue[Declaration]()
     var statements = mutable.Queue[Statement]()
 
     override def Execute(env: Environment): Unit = {
+        declarations.foreach(_.Execute(env))
+
         statements.foreach(_.Execute(env))
     }
 }

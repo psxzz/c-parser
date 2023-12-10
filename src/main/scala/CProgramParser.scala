@@ -3,7 +3,7 @@ import scala.util.parsing.combinator._
 class CProgramParser extends RegexParsers {
     private val number = """\b(0|[1-9]\d*)\b""".r
     private val identifier = """[a-zA-Z_][0-9a-zA-Z_]*""".r
-    private val typedef = """(int|bool)""".r
+    private val typedef = """\b(int|bool)\b""".r
 
     // Expressions
     def expr : Parser[Expression] = arith
@@ -33,13 +33,14 @@ class CProgramParser extends RegexParsers {
     // Statements
     def statement : Parser[Statement] = compound | assign | print
 
-    def compound : Parser[CompoundStmt] = "{" ~> rep(statement) <~ "}"^^ {
+    def compound : Parser[CompoundStmt] = "{" ~> rep(varDecl | funcDecl | statement) <~ "}"^^ {
         case Nil => CompoundStmt()
-        case stmts =>
+        case lines =>
             val comp = CompoundStmt()
 
-            for (stmt <- stmts) {
-                comp.statements += stmt
+            for (l <- lines) l match {
+                case d : Declaration => comp.declarations += d
+                case s : Statement => comp.statements += s
             }
 
             comp

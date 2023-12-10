@@ -5,10 +5,32 @@ class CProgramParser extends RegexParsers {
     private val identifier = """[a-zA-Z_][0-9a-zA-Z_]*""".r
     private val typedef = """(int|bool)""".r
 
-    def expr : Parser[Expression] = constant | identifier ^^ {id => Identifier(id)}
+    // Expressions
+    def expr : Parser[Expression] = arith
 
-    def constant: Parser[Expression] = number ^^ {n => Number(n.toInt)}
+    def arith : Parser[Expression] = mult ~ rep(("+" | "-") ~ mult) ^^ {
+        case e ~ Nil => e
+        case e ~ r =>
+            var result: Expression = e
+            for (x <- r) {
+                result = Op(result, x._1, x._2)
+            }
+            result
+    }
 
+    def mult : Parser[Expression] = constant ~ rep(("*" | "/") ~ constant) ^^ {
+        case c ~ Nil => c
+        case c ~ r =>
+            var result : Expression = c
+            for (x <- r) {
+                result = Op(result, x._1, x._2)
+            }
+            result
+    }
+
+    def constant: Parser[Expression] = number ^^ {n => Number(n.toInt)} | identifier ^^ {id => Identifier(id)} | "(" ~> expr <~ ")"
+
+    // Statements
     def statement : Parser[Statement] = compound | assign | print
 
     def compound : Parser[CompoundStmt] = "{" ~> rep(statement) <~ "}"^^ {
@@ -27,8 +49,10 @@ class CProgramParser extends RegexParsers {
         case id ~ _ ~ value => AssignStmt(id, value)
     }
 
-    def print : Parser[PrintStmt] = "print" ~> "(" ~> expr <~ ")" ^^ (e => PrintStmt(e))
+    def print : Parser[PrintStmt] = "print" ~> "(" ~> expr <~ ")" ~ ";" ^^ (e => PrintStmt(e))
 
+
+    // Declarations
     def varDecl: Parser[VarDecl] = typedef ~> identifier ~ opt("=" ~> expr) <~ ";" ^^ {
         case id ~ None => VarDecl(id, Number(0))
         case id ~ Some(v) => VarDecl(id, v)
@@ -41,6 +65,8 @@ class CProgramParser extends RegexParsers {
         }
     }
 
+
+    // Entrypoint
     def program: Parser[Program] = rep(varDecl | funcDecl) ^^ {
         decls => {
             val p = Program()

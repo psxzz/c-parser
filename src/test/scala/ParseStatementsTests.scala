@@ -30,6 +30,13 @@ class ParseStatementsTests extends AnyFunSuite {
         assert(result.successful)
         assert(result.get.statements.nonEmpty)
         assert(result.get.statements(0) == AssignStmt("a", Number(5)))
+
+        result = p.parse(p.compound, "{" +
+          "int a = 5;" +
+          "}")
+        assert(result.successful)
+        assert(result.get.declarations.nonEmpty)
+        assert(result.get.declarations(0) == VarDecl("a", Number(5)))
     }
 
 

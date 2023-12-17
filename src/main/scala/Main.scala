@@ -13,6 +13,6 @@ object Main {
             case parser.Error(msg, _) => println("ERROR: " + msg)
         }
 
-        result.get.Execute
+        result.get.Execute()
     }
 }

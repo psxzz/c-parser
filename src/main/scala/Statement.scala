@@ -21,3 +21,9 @@ case class PrintStmt(exp : Expression) extends Statement {
         println(exp.Calculate(env))
     }
 }
+
+case class LoopStmt(start : Expression, stop : Expression, stmt: Statement) extends Statement {
+    override def Execute(env: Environment): Unit = {
+        for (_ <- start.Calculate(env) to stop.Calculate(env)) stmt.Execute(env)
+    }
+}

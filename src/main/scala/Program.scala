@@ -12,14 +12,19 @@ case class Program() {
     var declarations = new mutable.Queue[Declaration]()
 
 
-    def Execute = {
+    def Execute(): Unit = {
         val globalEnv : Environment = new Environment
 
         declarations.foreach(_.Execute(globalEnv))
 
-        globalEnv.functions("main").get.Execute(globalEnv)
+        println("GLOBAL ENVIRONMENT\n" + globalEnv)
 
-        println(globalEnv)
+        if (!globalEnv.functions.keySet.contains("main")) {
+            println("[!] No function called \"main\" were found")
+            return
+        }
+
+        globalEnv.functions("main").get.Execute(globalEnv)
     }
 }
 

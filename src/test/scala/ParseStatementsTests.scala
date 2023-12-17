@@ -22,21 +22,21 @@ class ParseStatementsTests extends AnyFunSuite {
     test("Parse compound statement") {
         var result = p.parse(p.compound, "{}")
         assert(result.successful)
-        assert(result.get.statements.isEmpty)
+        assert(result.get.declarationsAndStatements.isEmpty)
 
         result = p.parse(p.compound, "{" +
           "a = 5;" +
           "}")
         assert(result.successful)
-        assert(result.get.statements.nonEmpty)
-        assert(result.get.statements(0) == AssignStmt("a", Number(5)))
+        assert(result.get.declarationsAndStatements.nonEmpty)
+        assert(result.get.declarationsAndStatements(0) == AssignStmt("a", Number(5)))
 
         result = p.parse(p.compound, "{" +
           "int a = 5;" +
           "}")
         assert(result.successful)
-        assert(result.get.declarations.nonEmpty)
-        assert(result.get.declarations(0) == VarDecl("a", Number(5)))
+        assert(result.get.declarationsAndStatements.nonEmpty)
+        assert(result.get.declarationsAndStatements(0) == VarDecl("a", Number(5)))
     }
 
 

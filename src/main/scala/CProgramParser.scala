@@ -6,7 +6,7 @@ class CProgramParser extends RegexParsers {
     private val typedef = """\b(int|bool)\b""".r
 
     // Expressions
-    def expr : Parser[Expression] = arith
+    def expr : Parser[Expression] = call | arith
 
     def arith : Parser[Expression] = mult ~ rep(("+" | "-") ~ mult) ^^ {
         case e ~ Nil => e
@@ -29,6 +29,8 @@ class CProgramParser extends RegexParsers {
     }
 
     def constant: Parser[Expression] = number ^^ {n => Number(n.toInt)} | identifier ^^ {id => Identifier(id)} | "(" ~> expr <~ ")"
+
+    def call : Parser[Expression] = identifier <~ "()" ^^ (id => Call(id))
 
     // Statements
     def statement : Parser[Statement] = compound | assign | print | loop | ret

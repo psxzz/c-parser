@@ -18,3 +18,10 @@ case class Op(left: Expression, op: String, right: Expression) extends Expressio
         }
     }
 }
+
+case class Call(id : String) extends Expression {
+    override def Calculate(env: Environment): Int = {
+        env.functions(id).get.Execute(env)
+        env.variables("__return")
+    }
+}

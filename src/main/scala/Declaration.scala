@@ -1,10 +1,8 @@
-abstract class Declaration {
-    def Execute(env : Environment): Unit
-}
+abstract class Declaration extends Executable
 
 case class VarDecl(id: String, exp: Expression) extends Declaration {
     override def Execute(env : Environment): Unit = {
-        env.variables += (id -> exp.calc(env))
+        env.variables += (id -> exp.Calculate(env))
     }
 }
 

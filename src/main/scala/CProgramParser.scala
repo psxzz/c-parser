@@ -38,11 +38,7 @@ class CProgramParser extends RegexParsers {
         case lines =>
             val comp = CompoundStmt()
 
-            for (l <- lines) l match {
-                case d : Declaration => comp.declarations += d
-                case s : Statement => comp.statements += s
-            }
-
+            for (l <- lines) comp.declarationsAndStatements += l
             comp
     }
 

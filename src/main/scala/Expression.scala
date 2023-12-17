@@ -1,22 +1,20 @@
-abstract class Expression {
-    def calc(env : Environment) : Int
-}
+abstract class Expression extends Calculable
 
 case class Number(value : Int) extends Expression {
-    def calc(env : Environment) : Int = value
+    override def Calculate(env: Environment): Int = value
 }
 
 case class Identifier(id: String) extends Expression {
-    def calc(env : Environment) : Int = env.variables(id)
+    override def Calculate(env: Environment): Int = env.variables(id)
 }
 
 case class Op(left: Expression, op: String, right: Expression) extends Expression {
-    override def calc(env: Environment): Int = {
+    override def Calculate(env: Environment): Int = {
         op match {
-            case "+" => left.calc(env) + right.calc(env)
-            case "-" => left.calc(env) - right.calc(env)
-            case "*" => left.calc(env) * right.calc(env)
-            case "/" => left.calc(env) / right.calc(env)
+            case "+" => left.Calculate(env) + right.Calculate(env)
+            case "-" => left.Calculate(env) - right.Calculate(env)
+            case "*" => left.Calculate(env) * right.Calculate(env)
+            case "/" => left.Calculate(env) / right.Calculate(env)
         }
     }
 }

@@ -22,3 +22,11 @@ case class Program() {
         println(globalEnv)
     }
 }
+
+trait Executable {
+    def Execute(env: Environment): Unit
+}
+
+trait Calculable {
+    def Calculate(env: Environment): Int
+}

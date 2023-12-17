@@ -31,7 +31,7 @@ class CProgramParser extends RegexParsers {
     def constant: Parser[Expression] = number ^^ {n => Number(n.toInt)} | identifier ^^ {id => Identifier(id)} | "(" ~> expr <~ ")"
 
     // Statements
-    def statement : Parser[Statement] = compound | assign | print | loop
+    def statement : Parser[Statement] = compound | assign | print | loop | ret
 
     def compound : Parser[CompoundStmt] = "{" ~> rep(varDecl | funcDecl | statement) <~ "}"^^ {
         case Nil => CompoundStmt()
@@ -51,6 +51,8 @@ class CProgramParser extends RegexParsers {
     def loop : Parser[LoopStmt] = "for" ~ expr ~ "to" ~ expr ~ "do" ~ statement ^^ {
       case _ ~ start ~ _ ~ stop ~ _ ~ stmt => LoopStmt(start, stop, stmt)
     }
+
+    def ret : Parser[ReturnStmt] = "return" ~> expr <~ ";" ^^ (e => ReturnStmt(e))
 
     // Declarations
     def varDecl: Parser[VarDecl] = typedef ~> identifier ~ opt("=" ~> expr) <~ ";" ^^ {

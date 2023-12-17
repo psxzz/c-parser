@@ -17,14 +17,13 @@ case class Program() {
 
         declarations.foreach(_.Execute(globalEnv))
 
-        println("GLOBAL ENVIRONMENT\n" + globalEnv)
-
         if (!globalEnv.functions.keySet.contains("main")) {
             println("[!] No function called \"main\" were found")
             return
         }
 
         globalEnv.functions("main").get.Execute(globalEnv)
+        println("GLOBAL ENVIRONMENT\n" + globalEnv)
     }
 }
 

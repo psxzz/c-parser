@@ -27,3 +27,7 @@ case class LoopStmt(start : Expression, stop : Expression, stmt: Statement) exte
         for (_ <- start.Calculate(env) to stop.Calculate(env)) stmt.Execute(env)
     }
 }
+
+case class ReturnStmt(exp : Expression) extends Statement {
+    override def Execute(env: Environment): Unit = env.variables("__return") = exp.Calculate(env)
+}

@@ -3,10 +3,10 @@ import scala.collection.mutable
 abstract class Statement extends Executable
 
 case class CompoundStmt() extends Statement {
-    var declarationsAndStatements = mutable.Queue[Executable]()
+    var executables = mutable.Queue[Executable]()
 
     override def Execute(env: Environment): Unit = {
-        declarationsAndStatements.foreach(_.Execute(env))
+        executables.foreach(_.Execute(env))
     }
 }
 

@@ -63,4 +63,21 @@ class ParseExpressionsTests extends AnyFunSuite{
         assert(result.get.Calculate(env) == 30)
     }
 
+    test("Parse function call") {
+        val env = new Environment
+
+        val comp = CompoundStmt()
+        comp.executables += AssignStmt("a", Number(5))
+        comp.executables += ReturnStmt(Number(0))
+
+        env.functions("foo") = Some(comp)
+
+        val result = p.parse(p.varDecl, "int res = foo();")
+        assert(result.successful)
+
+        result.get.Execute(env)
+        assert(env.variables("a") == 5)
+        assert(env.variables("__return") == 0)
+    }
+
 }

@@ -40,7 +40,7 @@ class CProgramParser extends RegexParsers {
         case lines =>
             val comp = CompoundStmt()
 
-            for (l <- lines) comp.declarationsAndStatements += l
+            for (l <- lines) comp.executables += l
             comp
     }
 

@@ -9,12 +9,11 @@ class Environment {
 };
 
 case class Program() {
+    val globalEnv : Environment = new Environment
     var declarations = new mutable.Queue[Declaration]()
 
 
     def Execute(): Unit = {
-        val globalEnv : Environment = new Environment
-
         declarations.foreach(_.Execute(globalEnv))
 
         if (!globalEnv.functions.keySet.contains("main")) {
